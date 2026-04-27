@@ -8,10 +8,12 @@ class EnemyPyramidWidget extends StatelessWidget {
     super.key,
     required this.enemies,
     required this.enemyKeys,
+    required this.bossMaxHp,
   });
 
   final List<Enemy> enemies;
   final Map<int, GlobalKey> enemyKeys;
+  final int bossMaxHp;
 
   @override
   Widget build(BuildContext context) {
@@ -21,42 +23,45 @@ class EnemyPyramidWidget extends StatelessWidget {
     final front = alive.where((e) => !e.isBoss && e.pyramidRow == 2).toList();
 
     return SizedBox(
-      height: 148,
+      height: 135,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Boss row
           if (boss != null)
-            KeyedSubtree(
+            EnemyWidget(
               key: enemyKeys.putIfAbsent(boss.id, GlobalKey.new),
-              child: EnemyWidget(enemy: boss),
+              enemy: boss,
+              bossMaxHp: bossMaxHp,
             )
           else
-            const SizedBox(height: kBossSize + 6),
-          const SizedBox(height: 6),
+            const SizedBox(height: kBossDisplaySize + 4),
+          const SizedBox(height: 4),
           // Mid row
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: mid.map((e) {
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: KeyedSubtree(
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                child: EnemyWidget(
                   key: enemyKeys.putIfAbsent(e.id, GlobalKey.new),
-                  child: EnemyWidget(enemy: e),
+                  enemy: e,
+                  bossMaxHp: bossMaxHp,
                 ),
               );
             }).toList(),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           // Front row
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: front.map((e) {
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 3),
-                child: KeyedSubtree(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: EnemyWidget(
                   key: enemyKeys.putIfAbsent(e.id, GlobalKey.new),
-                  child: EnemyWidget(enemy: e),
+                  enemy: e,
+                  bossMaxHp: bossMaxHp,
                 ),
               );
             }).toList(),

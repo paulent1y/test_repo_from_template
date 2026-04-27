@@ -9,6 +9,7 @@ import '../ui/game_board.dart';
 import 'boss_defeated_overlay.dart';
 import 'damage_popup_widget.dart';
 import 'enemy_pyramid_widget.dart';
+import 'enemy_widget.dart' show enemyDisplaySize;
 import 'projectile.dart';
 import 'projectile_widget.dart';
 import 'roguelite_controller.dart';
@@ -115,7 +116,7 @@ class _RogueliteScreenState extends State<RogueliteScreen> {
         .where((e) => e.id == p.targetEnemyId)
         .firstOrNull;
     if (enemy == null) return;
-    final eSize = enemy.isBoss ? 52.0 : 40.0;
+    final eSize = enemyDisplaySize(enemy.maxHp, _ctrl.rogueliteState.bossMaxHp);
     final pos = _enemyGlobal(p.targetEnemyId, eSize);
     if (pos == null) return;
     final id = ++_popupCounter;
@@ -237,8 +238,8 @@ class _BattleView extends StatelessWidget {
             EnemyPyramidWidget(
               enemies: rs.enemies,
               enemyKeys: enemyKeys,
+              bossMaxHp: rs.bossMaxHp,
             ),
-            const Divider(height: 1, color: Color(0xFFBBADA0)),
             // Board
             Expanded(
               child: GestureDetector(
@@ -247,7 +248,7 @@ class _BattleView extends StatelessWidget {
                   child: LayoutBuilder(
                     builder: (context, box) {
                       final boardSize =
-                          min(box.maxWidth, box.maxHeight).clamp(180.0, 480.0);
+                          min(box.maxWidth, box.maxHeight).clamp(160.0, 320.0);
                       onBoardSized(boardSize);
                       return SizedBox(
                         key: boardKey,
@@ -263,7 +264,6 @@ class _BattleView extends StatelessWidget {
                 ),
               ),
             ),
-            const Divider(height: 1, color: Color(0xFFBBADA0)),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: ControlBar(
@@ -305,7 +305,7 @@ class _BattleView extends StatelessWidget {
     final origin = boardCellGlobal(p.originCell.row, p.originCell.col);
     final enemy = rs.enemies.where((e) => e.id == p.targetEnemyId).firstOrNull;
     if (origin == null || enemy == null) return const SizedBox.shrink();
-    final eSize = enemy.isBoss ? 52.0 : 40.0;
+    final eSize = enemyDisplaySize(enemy.maxHp, rs.bossMaxHp);
     final target = enemyGlobal(p.targetEnemyId, eSize);
     if (target == null) return const SizedBox.shrink();
 

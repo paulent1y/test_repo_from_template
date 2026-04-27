@@ -70,5 +70,5 @@ class EnemyFactory {
   }
 
   static Offset _jitter(Random rng) =>
-      Offset(rng.nextDouble() * 20 - 10, rng.nextDouble() * 20 - 10);
+      Offset(rng.nextDouble() * 10 - 5, rng.nextDouble() * 10 - 5);
 }
