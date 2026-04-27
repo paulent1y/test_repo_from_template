@@ -248,7 +248,7 @@ class _BattleView extends StatelessWidget {
                   child: LayoutBuilder(
                     builder: (context, box) {
                       final boardSize =
-                          min(box.maxWidth, box.maxHeight).clamp(160.0, 320.0);
+                          min(box.maxWidth, box.maxHeight).clamp(120.0, 240.0);
                       onBoardSized(boardSize);
                       return SizedBox(
                         key: boardKey,
@@ -265,7 +265,7 @@ class _BattleView extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 4),
               child: ControlBar(
                 gridSize: ctrl.gridSize,
                 canUndo: ctrl.canUndo && rs.isRunning,

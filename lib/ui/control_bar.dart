@@ -21,6 +21,7 @@ class ControlBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         SegmentedButton<int>(
           segments: const [
@@ -33,12 +34,17 @@ class ControlBar extends StatelessWidget {
           onSelectionChanged:
               gridSizeEnabled ? (s) => onSizeChanged(s.first) : null,
           style: ButtonStyle(
+            visualDensity: VisualDensity.compact,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             textStyle: WidgetStateProperty.all(
-              const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+              const TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
+            ),
+            padding: WidgetStateProperty.all(
+              const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 6),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -47,14 +53,20 @@ class ControlBar extends StatelessWidget {
                 onPressed: () => onNewGame!(gridSize),
                 style: FilledButton.styleFrom(
                   backgroundColor: const Color(0xFF8F7A66),
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                 ),
-                child: const Text('New Game'),
+                child: const Text('New Game', style: TextStyle(fontSize: 13)),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
             ],
             FilledButton.tonal(
               onPressed: canUndo ? onUndo : null,
-              child: const Text('Undo'),
+              style: FilledButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              ),
+              child: const Text('Undo', style: TextStyle(fontSize: 13)),
             ),
           ],
         ),

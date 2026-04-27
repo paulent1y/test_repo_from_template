@@ -22,7 +22,6 @@ class RogueliteController extends ChangeNotifier {
   final GameController _game = GameController();
   final Random _rng = Random();
   int _projectileIdCounter = 0;
-  int _waveCount = 0;
   bool _disposed = false;
 
   static const _runDuration = 30;
@@ -46,12 +45,11 @@ class RogueliteController extends ChangeNotifier {
 
   void _startRun() {
     _timer?.cancel();
-    _waveCount = 0;
     _game.newGame(_game.gridSize);
     _state = _state.copyWith(
       timeRemaining: _runDuration,
       isRunning: true,
-      enemies: EnemyFactory.initialPyramid(_rng),
+      enemies: EnemyFactory.initialPyramid(_rng, bossMaxHp: _state.bossMaxHp),
       projectiles: [],
       showBossDefeated: false,
     );
@@ -187,18 +185,6 @@ class RogueliteController extends ChangeNotifier {
       'total_coins': coins,
     });
 
-    // Front row cleared → shift mid to front, spawn new back row
-    if (_state.frontRow.isEmpty && _state.midRow.isNotEmpty) {
-      _waveCount++;
-      final advanced = _state.enemies.map((e) {
-        if (!e.isBoss && e.pyramidRow == 1) return e.copyWith(pyramidRow: 2);
-        return e;
-      }).toList();
-      final newBack = EnemyFactory.spawnBackRow(_rng, _waveCount);
-      _state = _state.copyWith(enemies: [...advanced, ...newBack]);
-      appLog.info('roguelite', 'roguelite.wave_advance',
-          ctx: {'wave': _waveCount});
-    }
     notifyListeners();
   }
 
