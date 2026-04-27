@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'game/time_pressure_controller.dart';
 import 'logging/app_log.dart';
-import 'ui/time_pressure_screen.dart';
+import 'roguelite/roguelite_controller.dart';
+import 'roguelite/roguelite_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +18,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final TimePressureController _controller = TimePressureController();
+  final RogueliteController _controller = RogueliteController();
 
   @override
   void dispose() {
@@ -29,14 +29,14 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '2048',
+      title: '2048 Roguelite',
       debugShowCheckedModeBanner: false,
       navigatorObservers: [appLog.observer],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF8F7A66)),
         useMaterial3: true,
       ),
-      home: TimePressureScreen(controller: _controller),
+      home: RogueliteScreen(controller: _controller),
     );
   }
 }

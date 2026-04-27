@@ -3,10 +3,22 @@ import 'dart:math';
 import 'game_config.dart';
 import 'game_state.dart';
 
+class MergeEvent {
+  const MergeEvent({required this.row, required this.col, required this.value});
+  final int row;
+  final int col;
+  final int value;
+}
+
 class MoveResult {
-  const MoveResult({required this.state, required this.merged});
+  const MoveResult({
+    required this.state,
+    required this.merged,
+    required this.mergeEvents,
+  });
   final GameState state;
   final int merged;
+  final List<MergeEvent> mergeEvents;
 }
 
 class GameEngine {
@@ -26,6 +38,7 @@ class GameEngine {
     }
 
     final newTiles = <TileData>[];
+    final mergeEvents = <MergeEvent>[];
     var totalScore = 0;
     var totalMerges = 0;
 
@@ -46,6 +59,7 @@ class GameEngine {
           final val = inLane[i].value * 2;
           totalScore += val;
           totalMerges++;
+          mergeEvents.add(MergeEvent(row: nr, col: nc, value: val));
           newTiles.add(TileData(id: _newId(), value: val, row: nr, col: nc));
           i += 2;
         } else {
@@ -74,6 +88,7 @@ class GameEngine {
         status: newStatus,
       ),
       merged: totalMerges,
+      mergeEvents: mergeEvents,
     );
   }
 
