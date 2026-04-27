@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 const int defaultGridSize = 4;
 const int winTile = 2048;
 const int undoStackMax = 10;
+const List<int> timePressureDurations = [10, 20, 40, 60];
 
 const Map<int, Color> tileColors = {
   0: Color(0xFFCDC1B4),
