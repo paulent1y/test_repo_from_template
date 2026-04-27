@@ -22,8 +22,8 @@ class EnemyPyramidWidget extends StatelessWidget {
     final mid = alive.where((e) => !e.isBoss && e.pyramidRow == 1).toList();
     final front = alive.where((e) => !e.isBoss && e.pyramidRow == 2).toList();
 
-    return SizedBox(
-      height: 110,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 110),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

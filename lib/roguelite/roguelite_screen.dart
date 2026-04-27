@@ -275,13 +275,15 @@ class _BattleView extends StatelessWidget {
         children: [
           Column(
             children: [
-              WireframeWrapper(
-                label: 'pyramid 110dp',
-                color: _cPyramid,
-                child: EnemyPyramidWidget(
-                  enemies: rs.enemies,
-                  enemyKeys: enemyKeys,
-                  bossMaxHp: rs.bossMaxHp,
+              Flexible(
+                child: WireframeWrapper(
+                  label: 'pyramid',
+                  color: _cPyramid,
+                  child: EnemyPyramidWidget(
+                    enemies: rs.enemies,
+                    enemyKeys: enemyKeys,
+                    bossMaxHp: rs.bossMaxHp,
+                  ),
                 ),
               ),
               Expanded(
