@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # Claude Flutter Template
 
 ## Stack
@@ -24,6 +28,31 @@ MCP_SETUP.md            — Dart and Flame MCP server setup instructions
 ```
 
 Platforms scaffolded: Android, iOS, Web, Windows, macOS, Linux.
+
+## Logging Architecture
+
+`AppLog` is a singleton `WidgetsBindingObserver`. Call `AppLog.init()` before `runApp()` and wire `appLog.observer` into `MaterialApp.navigatorObservers` — route tracking won't work otherwise.
+
+**Write pipeline per event:**
+1. In-memory ring buffer (default 500 entries) — all platforms including web.
+2. `session.log` — all events ≥ `minFileLevel` (default TRACE). Soft-rotates at 50k lines.
+3. `errors.log` — WARN+ only. Soft-rotates at 10k lines.
+4. `focus.log` — single-sys filter, only when `LogConfig.enableFocusSys` is set (dev use).
+5. `summary.log` — auto-flushed on every ERROR+ event and on app lifecycle pause/detach. Read this first when debugging.
+
+File I/O is disabled on web (`kIsWeb`); ring buffer still works. All file writes are chained through a single `Future _chain` to prevent concurrent write races.
+
+**Fingerprint** (`fp` field): FNV-1a 32-bit hash of `evt|src|reason`, first 6 hex chars. Used to deduplicate repeated WARN+ events in `summary.log`.
+
+**`cid` validation regex:** `^[a-z][a-z0-9]*(?:-[a-z0-9]+){2,}$` — minimum three hyphen-separated segments (e.g. `auth-token-1`).
+
+**`LogConfig` customization** — pass to `AppLog.init(config: ...)`:
+- `minConsoleLevel` — what prints to console (default DEBUG)
+- `minFileLevel` — what writes to session.log (default TRACE)
+- `enableFocusSys` — sys name to isolate into focus.log
+- `enableSrc` — capture caller file:line via StackTrace (default: `kDebugMode` only)
+
+**Testing:** call `AppLog.resetForTesting()` in `setUp`/`tearDown` to reset the singleton between tests.
 
 ## Run Commands
 

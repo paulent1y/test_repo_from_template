@@ -16,7 +16,12 @@
       "Read(//c/Users/paul/.claude/plugins/cache/caveman/caveman/84cc3c14fa1e/skills/compress/**)",
       "Bash(python -m scripts \"D:/projects/flutter/claude_flutter_template/docs/LOGGING_GUIDE.md\")",
       "Bash(python -m scripts \"D:/projects/flutter/claude_flutter_template/docs/INSTALL.md\")",
-      "Bash(python -m scripts \"D:/projects/flutter/claude_flutter_template/instruction.md\")"
+      "Bash(python -m scripts \"D:/projects/flutter/claude_flutter_template/instruction.md\")",
+      "mcp__flame__search_documentation",
+      "mcp__flame__tutorial",
+      "Bash(dart analyze *)",
+      "Bash(flutter devices *)",
+      "Bash(flutter run *)"
     ]
   }
 }
