@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'game/game_controller.dart';
+import 'game/time_pressure_controller.dart';
 import 'logging/app_log.dart';
-import 'ui/game_screen.dart';
+import 'ui/time_pressure_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +18,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final GameController _controller = GameController();
+  final TimePressureController _controller = TimePressureController();
 
   @override
   void dispose() {
@@ -36,7 +36,7 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF8F7A66)),
         useMaterial3: true,
       ),
-      home: GameScreen(controller: _controller),
+      home: TimePressureScreen(controller: _controller),
     );
   }
 }

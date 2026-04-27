@@ -5,16 +5,18 @@ class ControlBar extends StatelessWidget {
     super.key,
     required this.gridSize,
     required this.canUndo,
-    required this.onNewGame,
+    this.onNewGame,
     required this.onUndo,
     required this.onSizeChanged,
+    this.gridSizeEnabled = true,
   });
 
   final int gridSize;
   final bool canUndo;
-  final void Function(int) onNewGame;
+  final void Function(int)? onNewGame;
   final VoidCallback onUndo;
   final void Function(int) onSizeChanged;
+  final bool gridSizeEnabled;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,8 @@ class ControlBar extends StatelessWidget {
             ButtonSegment(value: 6, label: Text('6×6')),
           ],
           selected: {gridSize},
-          onSelectionChanged: (s) => onSizeChanged(s.first),
+          onSelectionChanged:
+              gridSizeEnabled ? (s) => onSizeChanged(s.first) : null,
           style: ButtonStyle(
             textStyle: WidgetStateProperty.all(
               const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
@@ -39,14 +42,16 @@ class ControlBar extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            FilledButton(
-              onPressed: () => onNewGame(gridSize),
-              style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF8F7A66),
+            if (onNewGame != null) ...[
+              FilledButton(
+                onPressed: () => onNewGame!(gridSize),
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF8F7A66),
+                ),
+                child: const Text('New Game'),
               ),
-              child: const Text('New Game'),
-            ),
-            const SizedBox(width: 12),
+              const SizedBox(width: 12),
+            ],
             FilledButton.tonal(
               onPressed: canUndo ? onUndo : null,
               child: const Text('Undo'),
