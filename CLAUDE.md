@@ -124,4 +124,4 @@ Append to `claude_insights.md` in repo root when noticing anything surprising:
 - [x] Dart MCP server configured (project-level)
 - [x] Flame MCP server registered (user-level, see MCP_SETUP.md)
 - [x] Caveman plugin installed (user-level)
-- [ ] App-specific feature work (fill in when cloned)
+- [x] 2048 game — engine, controller, UI complete (working as of 2026-04-27)
