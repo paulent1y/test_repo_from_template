@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../debug/wireframe_wrapper.dart';
 import '../game/game_state.dart';
 import '../ui/control_bar.dart';
 import '../ui/game_board.dart';
@@ -18,6 +19,13 @@ import 'roguelite_state.dart';
 import 'upgrades_tab.dart';
 import 'talents_tab.dart';
 
+// Wireframe color palette per layer
+const _cHeader   = Color(0xFF2196F3); // blue
+const _cPyramid  = Color(0xFFFF9800); // orange
+const _cBoard    = Color(0xFF4CAF50); // green
+const _cControls = Color(0xFF9C27B0); // purple
+const _cExpanded = Color(0xFF00BCD4); // cyan
+
 class RogueliteScreen extends StatefulWidget {
   const RogueliteScreen({super.key, required this.controller});
   final RogueliteController controller;
@@ -31,12 +39,10 @@ class _RogueliteScreenState extends State<RogueliteScreen> {
   final FocusNode _focusNode = FocusNode();
   int _tabIndex = 0;
 
-  // Coordinate bridging
   final GlobalKey _boardKey = GlobalKey();
   final Map<int, GlobalKey> _enemyKeys = {};
   double _boardSize = 300.0;
 
-  // Ephemeral popup state (lives in widget, not controller)
   int _popupCounter = 0;
   final List<({int id, Offset pos, int damage, Color color})> _popups = [];
 
@@ -111,7 +117,6 @@ class _RogueliteScreenState extends State<RogueliteScreen> {
 
   void _onProjectileHit(Projectile p) {
     _ctrl.onProjectileHit(p.id);
-    // Spawn damage popup at enemy position
     final enemy = _ctrl.rogueliteState.enemies
         .where((e) => e.id == p.targetEnemyId)
         .firstOrNull;
@@ -137,6 +142,8 @@ class _RogueliteScreenState extends State<RogueliteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAF8EF),
+      floatingActionButton: _WireframeToggleFab(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
       body: SafeArea(
         child: KeyboardListener(
           focusNode: _focusNode,
@@ -148,11 +155,15 @@ class _RogueliteScreenState extends State<RogueliteScreen> {
               final rs = _ctrl.rogueliteState;
               return Column(
                 children: [
-                  RogueliteHeader(
-                    talentPoints: rs.talentPoints,
-                    timeRemaining: rs.timeRemaining,
-                    coins: rs.coins,
-                    isUrgent: rs.timeRemaining <= 5 && rs.isRunning,
+                  WireframeWrapper(
+                    label: 'header',
+                    color: _cHeader,
+                    child: RogueliteHeader(
+                      talentPoints: rs.talentPoints,
+                      timeRemaining: rs.timeRemaining,
+                      coins: rs.coins,
+                      isUrgent: rs.timeRemaining <= 5 && rs.isRunning,
+                    ),
                   ),
                   Expanded(
                     child: IndexedStack(
@@ -183,17 +194,44 @@ class _RogueliteScreenState extends State<RogueliteScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _tabIndex,
-        onTap: (i) => setState(() => _tabIndex = i),
-        backgroundColor: const Color(0xFFBBADA0),
-        selectedItemColor: const Color(0xFF3C3A32),
-        unselectedItemColor: const Color(0xFF776E65),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.sports_martial_arts), label: 'Battle'),
-          BottomNavigationBarItem(icon: Icon(Icons.upgrade), label: 'Upgrades'),
-          BottomNavigationBarItem(icon: Icon(Icons.star), label: 'Talents'),
-        ],
+      bottomNavigationBar: WireframeWrapper(
+        label: 'bottom-nav',
+        color: _cControls,
+        child: BottomNavigationBar(
+          currentIndex: _tabIndex,
+          onTap: (i) => setState(() => _tabIndex = i),
+          backgroundColor: const Color(0xFFBBADA0),
+          selectedItemColor: const Color(0xFF3C3A32),
+          unselectedItemColor: const Color(0xFF776E65),
+          items: const [
+            BottomNavigationBarItem(
+                icon: Icon(Icons.sports_martial_arts), label: 'Battle'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.upgrade), label: 'Upgrades'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.star), label: 'Talents'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WireframeToggleFab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: wireframeEnabled,
+      builder: (_, enabled, _) => FloatingActionButton.small(
+        onPressed: () => wireframeEnabled.value = !wireframeEnabled.value,
+        backgroundColor:
+            enabled ? const Color(0xFF2196F3) : const Color(0xFF8F7A66),
+        tooltip: 'Toggle wireframe',
+        child: Icon(
+          enabled ? Icons.grid_on : Icons.grid_off,
+          size: 18,
+          color: Colors.white,
+        ),
       ),
     );
   }
@@ -230,80 +268,94 @@ class _BattleView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Column(
-          children: [
-            // Enemy pyramid
-            EnemyPyramidWidget(
-              enemies: rs.enemies,
-              enemyKeys: enemyKeys,
-              bossMaxHp: rs.bossMaxHp,
-            ),
-            // Board
-            Expanded(
-              child: GestureDetector(
-                onPanEnd: onPanEnd,
-                child: Center(
-                  child: LayoutBuilder(
-                    builder: (context, box) {
-                      final boardSize =
-                          min(box.maxWidth, box.maxHeight).clamp(120.0, 240.0);
-                      onBoardSized(boardSize);
-                      return SizedBox(
-                        key: boardKey,
-                        width: boardSize,
-                        height: boardSize,
-                        child: GameBoard(
-                          state: ctrl.gameState,
-                          boardSize: boardSize,
-                        ),
-                      );
-                    },
+    return WireframeWrapper(
+      label: 'battle-tab',
+      color: _cExpanded,
+      child: Stack(
+        children: [
+          Column(
+            children: [
+              WireframeWrapper(
+                label: 'pyramid 110dp',
+                color: _cPyramid,
+                child: EnemyPyramidWidget(
+                  enemies: rs.enemies,
+                  enemyKeys: enemyKeys,
+                  bossMaxHp: rs.bossMaxHp,
+                ),
+              ),
+              Expanded(
+                child: WireframeWrapper(
+                  label: 'board-area',
+                  color: _cExpanded,
+                  child: GestureDetector(
+                    onPanEnd: onPanEnd,
+                    child: Center(
+                      child: LayoutBuilder(
+                        builder: (context, box) {
+                          final boardSize = min(box.maxWidth, box.maxHeight)
+                              .clamp(120.0, 240.0);
+                          onBoardSized(boardSize);
+                          return WireframeWrapper(
+                            label: 'board ${boardSize.round()}²',
+                            color: _cBoard,
+                            child: SizedBox(
+                              key: boardKey,
+                              width: boardSize,
+                              height: boardSize,
+                              child: GameBoard(
+                                state: ctrl.gameState,
+                                boardSize: boardSize,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: ControlBar(
-                gridSize: ctrl.gridSize,
-                canUndo: ctrl.canUndo && rs.isRunning,
-                onUndo: ctrl.undo,
-                onSizeChanged: ctrl.selectGridSize,
-                gridSizeEnabled: !rs.isRunning,
-              ),
-            ),
-          ],
-        ),
-        // Projectile + popup overlay (full screen)
-        Positioned.fill(
-          child: Stack(
-            children: [
-              // Projectiles
-              for (final p in rs.projectiles)
-                _buildProjectile(p),
-              // Damage popups
-              for (final pop in popups)
-                DamagePopupWidget(
-                  key: ValueKey(pop.id),
-                  damage: pop.damage,
-                  position: pop.pos,
-                  color: pop.color,
-                  onComplete: () => onPopupComplete(pop.id),
+              WireframeWrapper(
+                label: 'controls',
+                color: _cControls,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: ControlBar(
+                    gridSize: ctrl.gridSize,
+                    canUndo: ctrl.canUndo && rs.isRunning,
+                    onUndo: ctrl.undo,
+                    onSizeChanged: ctrl.selectGridSize,
+                    gridSizeEnabled: !rs.isRunning,
+                  ),
                 ),
+              ),
             ],
           ),
-        ),
-        // Boss defeated flash
-        if (rs.showBossDefeated) const BossDefeatedOverlay(),
-      ],
+          Positioned.fill(
+            child: Stack(
+              children: [
+                for (final p in rs.projectiles) _buildProjectile(p),
+                for (final pop in popups)
+                  DamagePopupWidget(
+                    key: ValueKey(pop.id),
+                    damage: pop.damage,
+                    position: pop.pos,
+                    color: pop.color,
+                    onComplete: () => onPopupComplete(pop.id),
+                  ),
+              ],
+            ),
+          ),
+          if (rs.showBossDefeated) const BossDefeatedOverlay(),
+        ],
+      ),
     );
   }
 
   Widget _buildProjectile(Projectile p) {
     final origin = boardCellGlobal(p.originCell.row, p.originCell.col);
-    final enemy = rs.enemies.where((e) => e.id == p.targetEnemyId).firstOrNull;
+    final enemy =
+        rs.enemies.where((e) => e.id == p.targetEnemyId).firstOrNull;
     if (origin == null || enemy == null) return const SizedBox.shrink();
     final eSize = enemyDisplaySize(enemy.maxHp, rs.bossMaxHp);
     final target = enemyGlobal(p.targetEnemyId, eSize);
