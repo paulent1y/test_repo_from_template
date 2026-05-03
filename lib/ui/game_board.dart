@@ -16,6 +16,8 @@ class GameBoard extends StatelessWidget {
     final n = state.size;
     final tileSize = (boardSize - gap * (n + 1)) / n;
 
+    if (tileSize <= 0) return const SizedBox.shrink();
+
     return Container(
       width: boardSize,
       height: boardSize,

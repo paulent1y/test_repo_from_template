@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 
-const int defaultGridSize = 4;
+const int defaultGridSize = 2;
 const int winTile = 2048;
 const int undoStackMax = 10;
 const List<int> timePressureDurations = [10, 20, 40, 60];
 
+/// Values spawned on empty cells: index 0 = common (90%), index 1 = rare (10%).
+/// Upgrades replace this list (e.g. [2, 4], [4, 8]).
+const List<int> defaultSpawnValues = [1, 2];
+
 const Map<int, Color> tileColors = {
   0: Color(0xFFCDC1B4),
+  1: Color(0xFFF9F5F0),
   2: Color(0xFFEEE4DA),
   4: Color(0xFFEDE0C8),
   8: Color(0xFFF2B179),

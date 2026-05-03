@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../debug/wireframe_wrapper.dart';
 import 'enemy.dart';
 import 'enemy_widget.dart';
+import 'roguelite_layout.dart';
+
+const _cBossRow = Color(0xFFFFD600);
+const _cRow1    = Color(0xFFFF9800);
+const _cRow2    = Color(0xFFFF7043);
+const _cRow3    = Color(0xFFFF5722);
 
 class EnemyPyramidWidget extends StatelessWidget {
   const EnemyPyramidWidget({
@@ -19,55 +26,64 @@ class EnemyPyramidWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final alive = enemies.where((e) => !e.isDead).toList();
     final boss = alive.where((e) => e.isBoss).firstOrNull;
-    final mid = alive.where((e) => !e.isBoss && e.pyramidRow == 1).toList();
-    final front = alive.where((e) => !e.isBoss && e.pyramidRow == 2).toList();
 
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxHeight: 110),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Boss row
-          if (boss != null)
-            EnemyWidget(
-              key: enemyKeys.putIfAbsent(boss.id, GlobalKey.new),
-              enemy: boss,
-              bossMaxHp: bossMaxHp,
-            )
-          else
-            const SizedBox(height: kBossDisplaySize + 4),
-          const SizedBox(height: 4),
-          // Mid row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: mid.map((e) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 3),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _bossRow(boss),
+        Expanded(child: _enemyRow(alive, row: 1, label: 'row-1', color: _cRow1, hPad: RogueliteLayout.pyramidMidHPad)),
+        Expanded(child: _enemyRow(alive, row: 2, label: 'row-2', color: _cRow2, hPad: RogueliteLayout.pyramidFrontHPad)),
+        Expanded(child: _enemyRow(alive, row: 3, label: 'row-3', color: _cRow3, hPad: RogueliteLayout.pyramidDenseHPad)),
+      ],
+    );
+  }
+
+  Widget _bossRow(Enemy? boss) {
+    return WireframeWrapper(
+      label: 'row-boss',
+      color: _cBossRow,
+      child: SizedBox(
+        height: RogueliteLayout.pyramidRowHeight,
+        child: boss != null
+            ? Center(
                 child: EnemyWidget(
-                  key: enemyKeys.putIfAbsent(e.id, GlobalKey.new),
-                  enemy: e,
+                  key: enemyKeys.putIfAbsent(boss.id, GlobalKey.new),
+                  enemy: boss,
                   bossMaxHp: bossMaxHp,
                 ),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 4),
-          // Front row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: front.map((e) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: EnemyWidget(
-                  key: enemyKeys.putIfAbsent(e.id, GlobalKey.new),
-                  enemy: e,
-                  bossMaxHp: bossMaxHp,
-                ),
-              );
-            }).toList(),
-          ),
-        ],
+              )
+            : const SizedBox.shrink(),
       ),
+    );
+  }
+
+  Widget _enemyRow(
+    List<Enemy> alive, {
+    required int row,
+    required String label,
+    required Color color,
+    required double hPad,
+  }) {
+    final rowEnemies = alive.where((e) => !e.isBoss && e.pyramidRow == row).toList();
+    return WireframeWrapper(
+      label: label,
+      color: color,
+      child: rowEnemies.isEmpty
+          ? const SizedBox.shrink()
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: rowEnemies.map((e) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: hPad),
+                  child: EnemyWidget(
+                    key: enemyKeys.putIfAbsent(e.id, GlobalKey.new),
+                    enemy: e,
+                    bossMaxHp: bossMaxHp,
+                  ),
+                );
+              }).toList(),
+            ),
     );
   }
 }

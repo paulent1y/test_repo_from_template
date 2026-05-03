@@ -19,6 +19,7 @@ class GameController extends ChangeNotifier {
   int _gridSize = defaultGridSize;
   Map<int, int> _bestScores = {};
   bool _disposed = false;
+  List<int> _spawnValues = defaultSpawnValues;
 
   // Slide animation duration — spawn fires after this delay.
   static const _slideDuration = Duration(milliseconds: 120);
@@ -26,6 +27,11 @@ class GameController extends ChangeNotifier {
   GameState get state => _state;
   int get gridSize => _gridSize;
   bool get canUndo => _undoStack.isNotEmpty;
+  List<int> get spawnValues => _spawnValues;
+
+  void setSpawnValues(List<int> values) {
+    _spawnValues = values;
+  }
 
   @override
   void dispose() {
@@ -36,7 +42,7 @@ class GameController extends ChangeNotifier {
   Future<void> _init() async {
     await _loadBestScores();
     final best = _bestScores[_gridSize] ?? 0;
-    _state = GameEngine.spawn(GameState.empty(_gridSize, bestScore: best), count: 2);
+    _state = GameEngine.spawn(GameState.empty(_gridSize, bestScore: best), count: 2, spawnValues: _spawnValues);
     if (!_disposed) notifyListeners();
   }
 
@@ -44,7 +50,7 @@ class GameController extends ChangeNotifier {
     _gridSize = size;
     _undoStack.clear();
     final best = _bestScores[size] ?? 0;
-    _state = GameEngine.spawn(GameState.empty(size, bestScore: best), count: 2);
+    _state = GameEngine.spawn(GameState.empty(size, bestScore: best), count: 2, spawnValues: _spawnValues);
     appLog.info('game', 'game.new', ctx: {'size': size});
     notifyListeners();
   }
@@ -76,7 +82,7 @@ class GameController extends ChangeNotifier {
       await Future.delayed(_slideDuration);
       if (_disposed) return;
 
-      _state = GameEngine.spawn(_state);
+      _state = GameEngine.spawn(_state, spawnValues: _spawnValues);
 
       if (!GameEngine.hasValidMoves(_state)) {
         _state = _state.copyWith(status: GameStatus.lost);

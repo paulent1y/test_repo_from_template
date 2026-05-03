@@ -67,14 +67,29 @@ class _BossDefeatedOverlayState extends State<BossDefeatedOverlay>
                     border: Border.all(
                         color: const Color(0xFFEDC22E), width: 2),
                   ),
-                  child: const Text(
-                    'BOSS DEFEATED',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
-                      color: Color(0xFFEDC22E),
-                      letterSpacing: 2,
-                    ),
+                  child: const Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'BOSS DEFEATED',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFFEDC22E),
+                          letterSpacing: 2,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Round Complete!',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFBBADA0),
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

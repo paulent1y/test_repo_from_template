@@ -93,7 +93,13 @@ class GameEngine {
   }
 
   /// Spawn [count] new tiles at random empty cells.
-  static GameState spawn(GameState state, {int count = 1}) {
+  /// [spawnValues] must have at least one element; index 0 = common (90%),
+  /// index 1 = rare (10%). Pass upgraded lists for roguelite talent effects.
+  static GameState spawn(
+    GameState state, {
+    int count = 1,
+    List<int> spawnValues = defaultSpawnValues,
+  }) {
     final grid = state.grid;
     final empties = <(int, int)>[];
     for (var r = 0; r < state.size; r++) {
@@ -103,12 +109,14 @@ class GameEngine {
     }
     if (empties.isEmpty) return state;
     empties.shuffle(_rng);
+    final common = spawnValues[0];
+    final rare = spawnValues.length > 1 ? spawnValues[1] : spawnValues[0];
     final newTiles = List<TileData>.from(state.tiles);
     for (var i = 0; i < count && i < empties.length; i++) {
       final (r, c) = empties[i];
       newTiles.add(TileData(
         id: _newId(),
-        value: _rng.nextDouble() < 0.9 ? 2 : 4,
+        value: _rng.nextDouble() < 0.9 ? common : rare,
         row: r,
         col: c,
       ));

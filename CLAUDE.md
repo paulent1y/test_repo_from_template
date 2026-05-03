@@ -20,6 +20,13 @@ lib/
     log_config.dart     — LogLevel enum, LogConfig, fingerprint, session ID
     log_observer.dart   — NavigatorObserver (callback-based, no AppLog dep)
     app_log.dart        — AppLog singleton, _LogWriters, _LogSummary
+  game/                 — pure 2048 engine (game_engine, game_controller, game_state, game_config)
+  ui/                   — shared widgets (GameBoard, TileWidget, ControlBar, ScorePanel)
+  roguelite/            — roguelite mode (enemy, projectile, state, controller, all widgets)
+    save_data.dart        — RogueliteSaveData value class (toJson/fromJson); extend here for new persistent fields
+    save_service.dart     — RogueliteSaveService; writes roguelite_save.json to getApplicationDocumentsDirectory()
+  debug/
+    wireframe_wrapper.dart — runtime overlay: colored borders + dp labels via CustomPaint
   main.dart
 docs/
   LOGGING_GUIDE.md      — full schema, vocabulary, Claude debug workflow
@@ -119,9 +126,19 @@ Append to `claude_insights.md` in repo root when noticing anything surprising:
 ## Build State Checklist
 
 - [x] Flutter project scaffolded (all platforms)
-- [x] Flame engine added (`^1.37.0`)
+- [x] Flame engine added (`^1.37.0`) — declared but unused; remove when cleaning deps
 - [x] AppLog logging system (`lib/logging/`)
 - [x] Dart MCP server configured (project-level)
 - [x] Flame MCP server registered (user-level, see MCP_SETUP.md)
 - [x] Caveman plugin installed (user-level)
 - [x] 2048 game — engine, controller, UI complete (working as of 2026-04-27)
+- [x] Roguelite mode — branch `roguelite`, feature-complete, v1.1.3+18 (2026-05-02)
+  - Enemy pyramid (3 rows, dynamic sizing), projectile system, 30s ms-precision timer
+  - Coins + talent persistence across runs, boss doubled-HP respawn
+  - Wireframe debug overlay (FAB toggle, CustomPaint, exact dp labels)
+  - Upgrades/Talents: placeholder locked cards (modal flow TBD)
+- [x] Save system — `save_data.dart` + `save_service.dart`; path_provider+JSON; no new dep
+  - Persists: coins, talentPoints, bossMaxHp, all upgrades (boardSize, spawnValue, bonusDamage, bonusCoinPerKill, bonusTimeSec), baseGridSize
+  - Controller loads on init (async, _startRun deferred until load done); saves fire-and-forget on mutations
+  - Extend: add field to RogueliteSaveData + toJson/fromJson with `?? default` fallback (auto-migrates old saves)
+- [ ] APK size: remove unused `flame` + `cupertino_icons` deps, use `--split-per-abi`

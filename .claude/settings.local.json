@@ -21,7 +21,23 @@
       "mcp__flame__tutorial",
       "Bash(dart analyze *)",
       "Bash(flutter devices *)",
-      "Bash(flutter run *)"
+      "Bash(flutter run *)",
+      "Bash(git -C \"D:/projects/flutter/test_repo_from_template\" status)",
+      "Bash(git checkout *)",
+      "Bash(flutter build *)",
+      "Bash(git reset *)",
+      "Bash(git merge --no-ff time-pressure -m ' *)",
+      "Bash(rm -f build/app/outputs/flutter-apk/app-release.apk)",
+      "Bash(cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/app-1.0.2+3-release.apk)",
+      "Bash(rm -f build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/app-1.0.2+3-release.apk)",
+      "Bash(cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/app-1.0.3+4-release.apk)",
+      "PowerShell(adb devices *)",
+      "PowerShell(adb *)",
+      "Bash(tailscale status *)",
+      "PowerShell(tailscale status *)",
+      "Bash(adb connect *)",
+      "Bash(adb devices *)",
+      "Bash(bash *)"
     ]
   }
 }
